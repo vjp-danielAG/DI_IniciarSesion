@@ -5,8 +5,10 @@
  */
 package t2_e12_iniciosesion;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import javax.swing.JOptionPane;
@@ -22,45 +24,39 @@ import org.openide.util.Exceptions;
  * @author dvaedog01
  */
 public class VentanaInicioSesion extends javax.swing.JFrame {
-    
+
     private String rFich = ".\\users.txt";
     private FileWriter fw = null;
     private BufferedWriter bw = null;
+    private FileReader fr = null;
+    private BufferedReader br = null;
 
     /**
      * Creates new form VentanaInicioSesion
      */
     public VentanaInicioSesion() {
-        try {
-            initComponents();
-            ValidationGroup gr = this.validationPanel1.getValidationGroup();
-            
-            gr.add(uNombre, StringValidators.REQUIRE_NON_EMPTY_STRING);
-            gr.add(uContrasenia, StringValidators.REQUIRE_NON_EMPTY_STRING);
-            gr.add(uNombre, StringValidators.NO_WHITESPACE);
-            gr.add(uContrasenia, StringValidators.NO_WHITESPACE);
-            
-            this.jButton1.setEnabled(false);
-            this.setDefaultCloseOperation(0);
-            
-            
-            validationPanel1.addChangeListener(new ChangeListener() {
-                @Override
-                public void stateChanged(ChangeEvent e) {
-                    if (validationPanel1.getProblem() == null) {
-                        jButton1.setEnabled(true);
-                    } else {
-                        jButton1.setEnabled(false);
-                    }
+
+        initComponents();
+        ValidationGroup gr = this.validationPanel1.getValidationGroup();
+
+        gr.add(uNombre, StringValidators.REQUIRE_NON_EMPTY_STRING);
+        gr.add(uContrasenia, StringValidators.REQUIRE_NON_EMPTY_STRING);
+        gr.add(uNombre, StringValidators.NO_WHITESPACE);
+        gr.add(uContrasenia, StringValidators.NO_WHITESPACE);
+
+        this.jButton1.setEnabled(false);
+
+        validationPanel1.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                if (validationPanel1.getProblem() == null) {
+                    jButton1.setEnabled(true);
+                } else {
+                    jButton1.setEnabled(false);
                 }
-            });
-            
-            fw = new FileWriter(new File(rFich),true);
-            bw = new BufferedWriter(fw);
-                
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
-        }
+            }
+        });
+
     }
 
     /**
@@ -203,33 +199,49 @@ public class VentanaInicioSesion extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        if (bw != null) {
-            try {
-                bw.write("--- Usuario ---");
-                bw.newLine();
-                bw.write("Nombre: " + uNombre.getText());
-                bw.newLine();
-                bw.write("Contraseña: " + uContrasenia.getText());
-                bw.newLine();
-                
-                JOptionPane.showMessageDialog(this, "Se ha añadido al usuario: "
-                        + uNombre.getText() + "\n" + 
-                        ", click \"Añadir Usuario\" para guardar los cambios en el TXT", 
-                        "INFO", JOptionPane.WARNING_MESSAGE);
-                
-            } catch (IOException ex) {
-                Exceptions.printStackTrace(ex);
-            }
+        try {
+            fw = new FileWriter(new File(rFich), true);
+            bw = new BufferedWriter(fw);
+
+            bw.write("--- Usuario ---");
+            bw.newLine();
+            bw.write(uNombre.getText() + "" + uContrasenia.getText());
+            bw.newLine();
+
+            JOptionPane.showMessageDialog(this, "Se ha añadido al usuario: " + uNombre.getText() + "\n", "INFO", JOptionPane.WARNING_MESSAGE);
+
+            bw.close();
+
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        boolean correctoU = false;
         try {
-            bw.close();
+            fr = new FileReader(new File(rFich));
+            br = new BufferedReader(fr);
+            
+            String lec;
+            
+            while ((lec = br.readLine()) != null) {
+                if (!correctoU && !uNombre.getText().isEmpty() && !uContrasenia.getText().isEmpty()) {
+                    correctoU = lec.equals(uNombre.getText() + "" + uContrasenia.getText());
+                }
+                System.out.println(correctoU);
+            }
+            
+            if (correctoU) {
+                JOptionPane.showMessageDialog(this, "El usuario se encuentra en el archivo TXT", "INFO", JOptionPane.INFORMATION_MESSAGE);
+            } else{
+                JOptionPane.showMessageDialog(this, "El usuario NO se encuentra en el archivo TXT","INFO", JOptionPane.ERROR_MESSAGE);
+            }
+            
+            br.close();
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
-        this.dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
