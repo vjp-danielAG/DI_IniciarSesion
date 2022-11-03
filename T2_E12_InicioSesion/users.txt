@@ -1,0 +1,9 @@
+--- Usuario ---
+Nombre: Dani
+Contraseña: 1234
+--- Usuario ---
+Nombre: Juan
+Contraseña: pw12345
+--- Usuario ---
+Nombre: Jaime
+Contraseña: ContraseniaDePrueba
